@@ -20,9 +20,8 @@ fn main() {
     // ひとまず引数が "ls" のときだけ処理
     if args.len() > 1 && args[1] == "ls" {
         let tasks = vec![
-        // 勉強のためString型を３つ別々で書いてみる
-        Task { id: 1, title: String::from("A") },
-        Task { id: 2, title: "B".to_string() },
+        Task { id: 1, title: "A".into() },
+        Task { id: 2, title: "B".into() },
         Task { id: 3, title: "C".into() },
         ];
 
