@@ -46,14 +46,33 @@ fn main() {
                     println!("使い方: cargo run -- add <todo>");
                 }
             }
+            "rm" => {
+                if args.len() > 2 {
+                    let id = args[2].parse().unwrap_or(0);
+                    let before = tasks.len();
+                    tasks.retain(|t| t.id != id);
+                    if tasks.len() < before {
+                        println!("削除しました: [{}]", id);
+                    } else {
+                        println!("ID {} のタスクは見つかりませんでした", id);
+                    }
+                    println!("=== TODO List ===");
+                    for task in &tasks {
+                        println!("{}", task);
+                    }
+                } else {
+                    println!("使い方: cargo run -- rm <ID>");
+                }
+            }
             _ => {
                 println!("コマンドが不明です。");
                 println!("使い方:");
                 println!("  cargo run -- ls");
                 println!("  cargo run -- add <todo>");
+                println!("  cargo run -- rm <ID>");
             }
         }
     } else {
-        println!("コマンドを指定してください。 (ls / add)");
+        println!("コマンドを指定してください。 (ls/add/rm)");
     }
 }
