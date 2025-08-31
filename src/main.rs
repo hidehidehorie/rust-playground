@@ -17,19 +17,43 @@ fn main() {
     // コマンドライン引数を取得
     let args: Vec<String> = env::args().collect();
 
-    // ひとまず引数が "ls" のときだけ処理
-    if args.len() > 1 && args[1] == "ls" {
-        let tasks = vec![
+    let mut tasks = vec![
         Task { id: 1, title: "A".into() },
         Task { id: 2, title: "B".into() },
         Task { id: 3, title: "C".into() },
-        ];
+    ];
+        
+    if args.len() > 1 {
+        match args[1].as_str() {
+            "ls" => {
+                println!("=== TODO List ===");
+                for task in &tasks {
+                    println!("{}", task);
+                }
+            }
+            "add" => {
+                if args.len() > 2 {
+                    let next_id = tasks.len() as u32 + 1;
+                    let title = args[2].clone();
+                    let new_task = Task { id: next_id, title };
+                    tasks.push(new_task);
 
-        println!("=== TODO List ===");
-        for task in tasks {
-            println!("{}", task);
+                    println!("追加しました:");
+                    for task in &tasks {
+                        println!("{}", task);
+                    }
+                } else {
+                    println!("使い方: cargo run -- add <todo>");
+                }
+            }
+            _ => {
+                println!("コマンドが不明です。");
+                println!("使い方:");
+                println!("  cargo run -- ls");
+                println!("  cargo run -- add <todo>");
+            }
         }
     } else {
-        println!("一覧表示: cargo run -- ls");
+        println!("コマンドを指定してください。 (ls / add)");
     }
 }
