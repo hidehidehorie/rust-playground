@@ -1,6 +1,10 @@
 use std::fmt;
 use std::env;
+use std::fs;
 
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
 struct Task {
     id: u32,
     title: String,
@@ -13,15 +17,25 @@ impl fmt::Display for Task {
     }
 }
 
+const DB_PATH: &str = "tasks.json";
+
+fn load_tasks() -> Vec<Task> {
+    match fs::read_to_string(DB_PATH) {
+        Ok(text) => serde_json::from_str(&text).unwrap_or_else(|_| Vec::new()),
+        Err(_) => Vec::new(), // ファイルがなければ空で開始
+    }
+}
+
+fn save_tasks(tasks: &Vec<Task>) {
+    let json = serde_json::to_string_pretty(tasks).expect("serialize failed");
+    fs::write(DB_PATH, json).expect("write failed");
+}
+
 fn main() {
     // コマンドライン引数を取得
     let args: Vec<String> = env::args().collect();
 
-    let mut tasks = vec![
-        Task { id: 1, title: "A".into() },
-        Task { id: 2, title: "B".into() },
-        Task { id: 3, title: "C".into() },
-    ];
+    let mut tasks = load_tasks();
         
     if args.len() > 1 {
         match args[1].as_str() {
@@ -37,6 +51,7 @@ fn main() {
                     let title = args[2].clone();
                     let new_task = Task { id: next_id, title };
                     tasks.push(new_task);
+                    save_tasks(&tasks);
 
                     println!("追加しました:");
                     for task in &tasks {
@@ -53,6 +68,7 @@ fn main() {
                     tasks.retain(|t| t.id != id);
                     if tasks.len() < before {
                         println!("削除しました: [{}]", id);
+                        save_tasks(&tasks);
                     } else {
                         println!("ID {} のタスクは見つかりませんでした", id);
                     }
